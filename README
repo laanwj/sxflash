@@ -1,0 +1,101 @@
+Belkin/Silex flashing utility 
+
+USE AT YOUR OWN RISK! Read the instructions.
+No batteries included, no guarantees. Life is too short for any of those.
+
+==============================================================================
+= License
+==============================================================================
+
+   Copyright (c) 2010 Wladimir J. van der Laan
+
+ Permission is hereby granted, free of charge, to any person
+ obtaining a copy of this software and associated documentation
+ files (the "Software"), to deal in the Software without
+ restriction, including without limitation the rights to use,
+ copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following
+ conditions:
+
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ OTHER DEALINGS IN THE SOFTWARE.
+
+==============================================================================
+= How to get into the bootloader
+==============================================================================
+
+This utility only works if the device is executing the bootloader. If you
+have a serial console attached you should see something about a CAKE / CREAM /
+DISH debug shell.
+
+Belkin F5L049:
+
+Hold the 'reset' button (at the bottom of the device) before powering on
+the device, then release it immediately. 
+
+==============================================================================
+= Usage
+==============================================================================
+Usage: sxflash eth0 <file.hex>
+
+!! The entire flash (app area) is cleared before starting !! 
+  if your device is still in unbricked state, make sure that you have a backup.
+
+Input must be in Motorola Hex format. Make sure that the input file targets
+the application area. This is 0xBF120000 - BFFF0000 in the Belkin F5L049.
+
+(the bootloader does a range check, but don't rely on this. If you manage to overwrite it, 
+JTAG is the only remaining unbrick option)
+
+After flashing, the command will be sent to boot into the OS.
+
+==============================================================================
+= Building the firmware from source
+==============================================================================
+
+To build a firmware image you can use the GPL firmware and MIPS toolchain
+you can find on http://www.belkin.com/support/opensource/ .
+
+Follow the instructions in the firmware 'README.TXT' carefully.
+
+Make sure that you extract the files as root, and build the sources as root.
+As the archive contains /dev/... device nodes for the preinstall file system,
+extracting as user will result in an invalid firmware. This is how I bricked
+my device in the first place.
+
+The file to use with this program will be called
+"F5L049v1000_1.00.04_OSS/build/Van_Halen.hex".
+
+==============================================================================
+= Important
+==============================================================================
+
+This program is meant to be use with one Silex device connected to the 
+ethernet port. The utility automatically finds out what the MAC address of 
+the target is by sending a Sx browse request. Obviously, this only works if
+there is only a single Sx device connected to that ethernet port. It also 
+doesn't check the origin of packets at the moment (as long as they have the 
+right ethertype 0x8813 and are adressed to us). To support multiple devices 
+on, the program needs a few changes.
+
+==============================================================================
+= Build
+==============================================================================
+
+$ make
+
+==============================================================================
+= Contact
+==============================================================================
+
+Wladimir J. van der Laan <laanwj@gmail.com>
